@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "0xrichardh.gcal-events",
+  "name": "Google Calendar Events",
+  "version": "1.0.0",
+  "author": "0xrichardh",
+  "license": "MIT",
+  "description": "Shows your next Google Calendar event in the bar, with an agenda popup. Reads a private iCal feed URL over HTTPS — no OAuth, no Google Cloud project.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Google Calendar Events",
+    "description": "Next event + agenda popup from a Google Calendar secret iCal address.",
+    "category": "Info",
+    "allowMultiple": false,
+    "defaultSection": "center",
+    "defaults": {
+      "refreshIntervalSec": 300,
+      "lookaheadHours": 72,
+      "maxEventsShown": 6
+    },
+    "schema": [
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "Refresh interval (seconds)",
+        "min": 60,
+        "max": 3600,
+        "step": 30,
+        "defaultValue": 300
+      },
+      {
+        "key": "lookaheadHours",
+        "type": "integer",
+        "label": "Show events within (hours)",
+        "min": 1,
+        "max": 168,
+        "step": 1,
+        "defaultValue": 72
+      },
+      {
+        "key": "maxEventsShown",
+        "type": "integer",
+        "label": "Max events in popup",
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "defaultValue": 6
+      }
+    ]
+  }
+}
