@@ -92,6 +92,13 @@ here):
   is `false`); merging multiple feeds is a reasonable follow-up but out of
   scope for v1.
 
+## Dependencies
+
+`curl` and `bash` — both ship standard on Omarchy. No other packages,
+services, or language runtimes required. `Model.js` is plain JavaScript
+run inside the Quickshell QML engine; `tools/test-model.js` needs Node
+only for running the test suite during development, not at runtime.
+
 ## Development
 
 `Model.js` has no QML/Quickshell imports — all ICS parsing, RRULE
