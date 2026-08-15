@@ -16,6 +16,19 @@ project. It reads your calendar's private iCal feed URL over plain HTTPS.
 
 ![Agenda popup](preview.png)
 
+## Installation
+
+```sh
+omarchy plugin add https://github.com/0xRichardH/omarchy-gcal-events.git --enable
+```
+
+This clones the plugin into `~/.config/omarchy/plugins/0xrichardh.gcal-events/`
+and enables it in your bar. To remove it later:
+
+```sh
+omarchy plugin remove 0xrichardh.gcal-events
+```
+
 ## Setup
 
 Google Calendar can hand out a **secret address in iCal format** for any
@@ -95,15 +108,13 @@ Structural/manifest checks:
 omarchy plugin validate .
 ```
 
-Local testing against your live bar:
+Local testing against your live bar: edit the files directly under
+`~/.config/omarchy/plugins/0xrichardh.gcal-events/` (that's where
+`omarchy plugin add` clones this repo to), then rescan:
 
 ```sh
-omarchy plugin clone 0xrichardh.gcal-events --edit   # if installing from a repo
 omarchy-shell shell rescanPlugins
 ```
-
-(Already-cloned-in-place plugins under `~/.config/omarchy/plugins/`, like
-this one during development, just need a rescan after edits.)
 
 ## License
 
