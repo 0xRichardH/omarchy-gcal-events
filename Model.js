@@ -419,11 +419,6 @@ function buildAgenda(rawIcs, nowMs, windowEndMs, maxEvents) {
 
 // ---- Display formatting ---------------------------------------------------
 
-function truncate(text, max) {
-  var t = String(text || "")
-  return t.length > max ? t.slice(0, Math.max(0, max - 1)) + "…" : t
-}
-
 function formatClock(ms) {
   var d = new Date(ms)
   var hours = d.getHours()
@@ -484,17 +479,20 @@ function groupByDay(occurrences, nowMs) {
 //   - starting within the hour       -> icon + title + countdown
 //   - ongoing                        -> icon + title + "now"
 // Full detail is always one hover (tooltip) or click (agenda) away, so
-// nothing is actually lost by keeping the pill quiet most of the day.
+// nothing is actually lost by keeping the pill quiet most of the day. The
+// title itself is never character-truncated here — MarqueeText.qml caps
+// the rendered width and reveals the rest on hover instead, so a long
+// title isn't permanently cut down to a fixed character count.
 function formatBarLabel(nextEvent, nowMs) {
   if (!nextEvent) return CALENDAR_GLYPH
 
   var ongoing = nextEvent.startMs <= nowMs && nextEvent.endMs > nowMs
-  if (ongoing) return CALENDAR_GLYPH + " " + truncate(nextEvent.summary, 22) + " · now"
+  if (ongoing) return CALENDAR_GLYPH + " " + nextEvent.summary + " · now"
 
   var minutesUntil = Math.round((nextEvent.startMs - nowMs) / 60000)
   if (minutesUntil <= 60) {
     var rel = minutesUntil < 1 ? "now" : "in " + minutesUntil + "m"
-    return CALENDAR_GLYPH + " " + truncate(nextEvent.summary, 22) + " " + rel
+    return CALENDAR_GLYPH + " " + nextEvent.summary + " " + rel
   }
 
   if (daysBetween(nowMs, nextEvent.startMs) === 0) return CALENDAR_GLYPH + " " + formatClock(nextEvent.startMs)
@@ -537,7 +535,6 @@ if (typeof module !== "undefined") {
     parseVeventBlock: parseVeventBlock,
     extractMeetingUrl: extractMeetingUrl,
     buildAgenda: buildAgenda,
-    truncate: truncate,
     formatClock: formatClock,
     formatEventTime: formatEventTime,
     daysBetween: daysBetween,

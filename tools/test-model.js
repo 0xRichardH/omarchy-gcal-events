@@ -248,6 +248,12 @@ check("event in 45m -> title + countdown", Model.formatBarLabel(imminentEvent, N
 var ongoingEvent = { summary: "1:1 with Sam", startMs: NOW - 15 * 60 * 1000, endMs: NOW + 15 * 60 * 1000, allDay: false }
 check("ongoing event -> title + now", Model.formatBarLabel(ongoingEvent, NOW) === GLYPH + " 1:1 with Sam · now")
 
+// Model no longer character-truncates long titles — MarqueeText.qml owns
+// width capping + hover-to-reveal scrolling on the QML side instead.
+var longTitle = "Quarterly Planning and Roadmap Alignment Sync"
+var longTitleEvent = { summary: longTitle, startMs: NOW + 10 * 60 * 1000, endMs: NOW + 40 * 60 * 1000, allDay: false }
+check("long title passes through untruncated", Model.formatBarLabel(longTitleEvent, NOW) === GLYPH + " " + longTitle + " in 10m")
+
 // ---- feed URL validation ----
 check("valid gcal ics url passes", Model.validateFeedUrl("https://calendar.google.com/calendar/ical/me%40gmail.com/private-abc123/basic.ics") === "")
 check("empty url rejected", Model.validateFeedUrl("") !== "")

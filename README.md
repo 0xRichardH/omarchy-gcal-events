@@ -15,6 +15,8 @@ project. It reads your calendar's private iCal feed URL over plain HTTPS.
   birthdays, edited single occurrences) are expanded locally.
 - One-click **Join** link next to events with a Google Meet, Zoom, Teams,
   or Webex link.
+- Long titles elide rather than stretch the bar — hover the pill or an
+  agenda row to scroll through the full title.
 
 ![Agenda popup](preview.png)
 

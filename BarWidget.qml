@@ -51,6 +51,8 @@ BarWidget {
     if (panelLoader.item) panelLoader.item.closeForPopoutSwitch()
   }
 
+  readonly property string label: panelLoader.item ? panelLoader.item.label : ""
+
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
@@ -72,16 +74,32 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: panelLoader.item ? panelLoader.item.label : ""
+    // Text stays empty and rendering is handed to MarqueeText below: the
+    // base label is unbounded (an imminent event's title can be long), and
+    // WidgetButton would otherwise size the whole pill — and the bar slot
+    // around it — to fit it in full. fixedWidth caps it instead.
+    text: ""
+    hasVisualContent: root.label !== ""
     tooltipText: panelLoader.item ? panelLoader.item.tooltipText : ""
     active: panelLoader.item ? panelLoader.item.urgent === true : false
     horizontalMargin: 8.75
     verticalPadding: 8.75
+    fixedWidth: marqueeLabel.implicitWidth + Style.spaceReal(horizontalMargin) * 2
 
     onPressed: function(b) {
       if (b === Qt.RightButton) Qt.openUrlExternally("https://calendar.google.com/")
       else if (b === Qt.MiddleButton) root.refresh()
       else root.togglePanel()
+    }
+
+    MarqueeText {
+      id: marqueeLabel
+      anchors.centerIn: parent
+      text: root.label
+      textColor: button.active && button.useActiveColor ? button.activeColor : button.foreground
+      fontFamily: button.fontFamily
+      fontPixelSize: button.fontSize
+      capWidth: Style.space(170)
     }
   }
 }
