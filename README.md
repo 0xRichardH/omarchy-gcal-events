@@ -13,6 +13,8 @@ project. It reads your calendar's private iCal feed URL over plain HTTPS.
   refresh.
 - Recurring events (daily standups, "2nd Friday" meetings, yearly
   birthdays, edited single occurrences) are expanded locally.
+- One-click **Join** link next to events with a Google Meet, Zoom, Teams,
+  or Webex link.
 
 ![Agenda popup](preview.png)
 
