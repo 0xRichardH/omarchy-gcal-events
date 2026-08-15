@@ -53,8 +53,8 @@ Two things worth knowing before you start:
   whole calendar, including private events. It's stored at
   `~/.local/state/omarchy/plugins/0xrichardh.gcal-events/feed-url.txt`
   with `600` permissions — not in `shell.json`, and never passed as a
-  command-line argument (it's piped over stdin to the save script, so it
-  never shows up in `ps`).
+  command-line argument (saving and fetching pipe the secret via stdin
+  to avoid disclosing it in `ps`).
 - **This isn't real-time.** Google caches the feed server-side; changes
   usually show up within a few hours, not seconds. Good for "what's next,"
   not for a live meeting-in-progress indicator.

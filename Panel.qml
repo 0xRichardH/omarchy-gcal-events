@@ -12,10 +12,11 @@ import "Model.js" as Model
 // Data flow: feedUrlFile (FileView) reads the secret iCal URL from
 // ~/.local/state/omarchy/plugins/<id>/feed-url.txt — kept out of
 // shell.json deliberately, since it's a bearer secret, not a display
-// preference. fetchProc curls that URL on open/refresh/timer and hands the
-// raw ICS text to Model.buildAgenda(). Saving a new URL goes through
-// bin/save-feed-url.sh over stdin (never argv) so the secret never shows
-// up in `ps`.
+// preference. fetchProc fetches that URL via bin/fetch-feed.sh (which passes
+// the URL to curl via --config - on stdin so the secret never appears in
+// `ps` / argv) on open/refresh/timer and hands the raw ICS text to
+// Model.buildAgenda(). Saving a new URL goes through bin/save-feed-url.sh
+// over stdin (never argv) so the secret never shows up in `ps`.
 Panel {
   id: root
   moduleName: "0xrichardh.gcal-events"
@@ -68,6 +69,7 @@ Panel {
 
   readonly property string feedUrlPath: (Quickshell.env("HOME") || "") + "/.local/state/omarchy/plugins/" + root.moduleName + "/feed-url.txt"
   readonly property string helperScriptPath: String(Qt.resolvedUrl(".")).replace(/^file:\/\//, "") + "bin/save-feed-url.sh"
+  readonly property string fetchScriptPath: String(Qt.resolvedUrl(".")).replace(/^file:\/\//, "") + "bin/fetch-feed.sh"
 
   function open() {
     root.controller.show()
@@ -92,7 +94,7 @@ Panel {
   function fetchNow() {
     if (root.feedUrl === "" || fetchProc.running) return
     root.fetching = true
-    fetchProc.command = ["curl", "-fsS", "--max-time", "10", root.feedUrl]
+    fetchProc.command = ["bash", root.fetchScriptPath, root.feedUrlPath]
     fetchProc.running = true
   }
 
