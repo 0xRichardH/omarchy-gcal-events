@@ -289,7 +289,7 @@ function expandRecurrence(dtstartMs, durationMs, rrule, exdateSet, windowStartMs
 
 function parseVeventBlock(block) {
   var ev = {
-    uid: "", summary: "", location: "", status: "",
+    uid: "", summary: "", location: "", description: "", status: "",
     dtstart: null, dtend: null, rrule: null, exdates: [], recurrenceId: null
   }
   for (var i = 0; i < block.length; i++) {
@@ -297,6 +297,7 @@ function parseVeventBlock(block) {
     if (cl.name === "UID") ev.uid = cl.value
     else if (cl.name === "SUMMARY") ev.summary = unescapeText(cl.value)
     else if (cl.name === "LOCATION") ev.location = unescapeText(cl.value)
+    else if (cl.name === "DESCRIPTION") ev.description = unescapeText(cl.value)
     else if (cl.name === "STATUS") ev.status = cl.value.toUpperCase()
     else if (cl.name === "DTSTART") ev.dtstart = parseIcsDateTime(cl.value, cl.params)
     else if (cl.name === "DTEND") ev.dtend = parseIcsDateTime(cl.value, cl.params)
@@ -316,11 +317,27 @@ function parseVeventBlock(block) {
   return ev
 }
 
+// Google's ICS export has no structured "conference data" field (that only
+// exists in the real Calendar API) — but a Meet/Zoom/Teams/Webex link, when
+// present, reliably shows up as plain text in LOCATION and/or DESCRIPTION.
+// LOCATION wins when both carry one, since that's where Google's own "Add
+// Google Meet video conferencing" puts it.
+var MEETING_URL_PATTERN = /https?:\/\/(?:[a-z0-9-]+\.)*(?:meet\.google\.com|zoom\.us|teams\.microsoft\.com|teams\.live\.com|webex\.com)\/[^\s<>"']+/i
+
+function extractMeetingUrl(location, description) {
+  var fromLocation = String(location || "").match(MEETING_URL_PATTERN)
+  if (fromLocation) return fromLocation[0]
+  var fromDescription = String(description || "").match(MEETING_URL_PATTERN)
+  if (fromDescription) return fromDescription[0]
+  return ""
+}
+
 function toOccurrence(ev, startMs, endMs) {
   return {
     uid: ev.uid,
     summary: ev.summary || "(No title)",
     location: ev.location || "",
+    meetingUrl: extractMeetingUrl(ev.location, ev.description),
     startMs: startMs,
     endMs: endMs,
     allDay: ev.dtstart.allDay
@@ -518,6 +535,7 @@ if (typeof module !== "undefined") {
     nthWeekdayOfMonth: nthWeekdayOfMonth,
     expandRecurrence: expandRecurrence,
     parseVeventBlock: parseVeventBlock,
+    extractMeetingUrl: extractMeetingUrl,
     buildAgenda: buildAgenda,
     truncate: truncate,
     formatClock: formatClock,

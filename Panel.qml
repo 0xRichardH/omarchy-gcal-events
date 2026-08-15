@@ -402,16 +402,36 @@ Panel {
                     }
 
                     Text {
-                      // Sized off the dot's and time label's *actual* rendered
-                      // width rather than a guessed constant — "5:30 PM – 6:00
-                      // PM" doesn't reliably fit a fixed pixel budget across
-                      // fonts/locales, and a stale guess overlaps the title.
-                      width: parent.width - statusDot.width - timeLabel.width - parent.spacing * 2
+                      // Sized off the dot's, time label's, and join link's
+                      // *actual* rendered widths rather than guessed
+                      // constants — "5:30 PM – 6:00 PM" doesn't reliably fit
+                      // a fixed pixel budget across fonts/locales, and a
+                      // stale guess overlaps neighboring cells.
+                      width: parent.width - statusDot.width - timeLabel.width
+                        - (joinLink.visible ? joinLink.width + parent.spacing : 0) - parent.spacing * 2
                       elide: Text.ElideRight
                       text: modelData.summary
                       color: root.contentForeground
                       font.family: root.contentFontFamily
                       font.pixelSize: Style.font.bodySmall
+                    }
+
+                    Text {
+                      id: joinLink
+                      visible: modelData.meetingUrl !== ""
+                      text: "Join"
+                      color: Color.accent
+                      font.family: root.contentFontFamily
+                      font.pixelSize: Style.font.bodySmall
+                      font.underline: joinMouse.containsMouse
+
+                      MouseArea {
+                        id: joinMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Qt.openUrlExternally(modelData.meetingUrl)
+                      }
                     }
                   }
                 }

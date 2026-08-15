@@ -183,6 +183,42 @@ var ics8 = [
 ].join("\r\n")
 check("cancelled event excluded", Model.buildAgenda(ics8, NOW, WEEK, 10).length === 0)
 
+// ---- meeting link extraction ----
+check("Meet link found in LOCATION", Model.extractMeetingUrl("https://meet.google.com/abc-defg-hij", "") === "https://meet.google.com/abc-defg-hij")
+check("Meet link found in DESCRIPTION", Model.extractMeetingUrl("", "Join with Google Meet\nhttps://meet.google.com/abc-defg-hij\n\nOr dial: +1 555-0100") === "https://meet.google.com/abc-defg-hij")
+check("LOCATION wins when both carry a link", Model.extractMeetingUrl("https://meet.google.com/loc-ation-x", "https://meet.google.com/desc-ripti-on") === "https://meet.google.com/loc-ation-x")
+check("Zoom subdomain link recognized", Model.extractMeetingUrl("", "https://us02web.zoom.us/j/1234567890?pwd=abc123") === "https://us02web.zoom.us/j/1234567890?pwd=abc123")
+check("Teams link recognized", Model.extractMeetingUrl("https://teams.microsoft.com/l/meetup-join/19%3ameeting_abc", "") === "https://teams.microsoft.com/l/meetup-join/19%3ameeting_abc")
+check("no meeting link -> empty string", Model.extractMeetingUrl("Conference Room 4B", "Bring the laptop.") === "")
+check("stops at whitespace, not the rest of the sentence", Model.extractMeetingUrl("", "Meet: https://meet.google.com/abc-defg-hij for the sync") === "https://meet.google.com/abc-defg-hij")
+
+var icsWithMeet = [
+  "BEGIN:VCALENDAR",
+  "BEGIN:VEVENT",
+  "UID:meet1@test",
+  "SUMMARY:Design Review",
+  "DTSTART:20260818T090000",
+  "DTEND:20260818T093000",
+  "LOCATION:https://meet.google.com/abc-defg-hij",
+  "DESCRIPTION:Join with Google Meet\\nhttps://meet.google.com/abc-defg-hij",
+  "END:VEVENT",
+  "END:VCALENDAR"
+].join("\r\n")
+check("buildAgenda surfaces meetingUrl on the occurrence", Model.buildAgenda(icsWithMeet, NOW, WEEK, 10)[0].meetingUrl === "https://meet.google.com/abc-defg-hij")
+
+var icsNoMeet = [
+  "BEGIN:VCALENDAR",
+  "BEGIN:VEVENT",
+  "UID:nomeet1@test",
+  "SUMMARY:In-person lunch",
+  "DTSTART:20260818T120000",
+  "DTEND:20260818T130000",
+  "LOCATION:Cafe on 5th",
+  "END:VEVENT",
+  "END:VCALENDAR"
+].join("\r\n")
+check("buildAgenda leaves meetingUrl empty when there is none", Model.buildAgenda(icsNoMeet, NOW, WEEK, 10)[0].meetingUrl === "")
+
 // ---- not an ICS feed at all (e.g. wrong URL pasted, got HTML back) ----
 var threw = false
 try { Model.buildAgenda("<html><body>nope</body></html>", NOW, WEEK, 10) } catch (e) { threw = true; check("throws recognizable error", e.code === "not-icalendar") }
